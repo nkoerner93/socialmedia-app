@@ -17,7 +17,7 @@ import { useState } from "react";
 
 const SignupForm = () => {
   // Loading State
-  let [isLoading, setIsLoading] = useState(true);
+  let [isLoading, setIsLoading] = useState(false);
   let accountCreated = false;
 
   // 1. Define your form.
@@ -72,7 +72,7 @@ const SignupForm = () => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
-                        className="text-black"
+                        className="text-white shad-input"
                         placeholder="Enter name"
                         type="name"
                         {...field}
@@ -90,7 +90,7 @@ const SignupForm = () => {
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        className="text-black"
+                        className="text-white shad-input"
                         placeholder="Enter username"
                         type="username"
                         {...field}
@@ -108,7 +108,7 @@ const SignupForm = () => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        className="text-black"
+                        className="text-white shad-input"
                         placeholder="Enter Email"
                         type="email"
                         {...field}
@@ -126,7 +126,7 @@ const SignupForm = () => {
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
-                        className="text-black"
+                        className="text-white shad-input"
                         placeholder="Enter password"
                         type="password"
                         {...field}
@@ -136,7 +136,7 @@ const SignupForm = () => {
                   </FormItem>
                 )}
               />
-              <Button className="shad-button_primary" type="submit">
+              <Button className="shad-button_primary pt-2" type="submit">
                 {isLoading ? (
                   <div className="flex flex-row items-center gap-2">
                     <Loader /> Loading...
