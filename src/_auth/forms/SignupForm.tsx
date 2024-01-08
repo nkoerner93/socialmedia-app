@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { SignupValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
 import { useState } from "react";
+import { createUserAccount } from "@/lib/appwrite/api";
 
 const SignupForm = () => {
   // Loading State
@@ -33,17 +34,9 @@ const SignupForm = () => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
-    // Set isLoading to true before submitting the form
-    setIsLoading(true);
+    const newUser = await createUserAccount(values);
 
-    // Simulate an asynchronous action (e.g., API call)
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Set isLoading to false after form submission
-    setIsLoading(false);
-
-    // Handle the form submission logic
-    accountCreated = true;
+    console.log(newUser);
   }
 
   return (
