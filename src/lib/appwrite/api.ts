@@ -4,18 +4,19 @@ import { account, appwriteConfig, databases } from './config';
 
 
 
-export async function createUserAccount(user:INewUser) {
+export async function createUserAccount(user: INewUser) {
     try {
+        // Using the Appwrite library to create a new user account
         const newAccount = await account.create(
             ID.unique(),
             user.email,
             user.password,
             user.name
-        )
-        return true;
+        );
+        return true; // Indicate success
     } catch (error) {
         console.log(error);
-        return false;
+        return false; // Indicate failure
     }
 }
 
@@ -29,5 +30,15 @@ export async function saveUserToDb(user:IDbUser) {
         )  
     } catch (error) {
         
+    }
+}
+
+export async function signInAccount(user: { email: string; password:string;}) {
+    try {
+        const session = await account.createEmailSession(user.email, user.password);
+
+        return session;
+    } catch (error) {
+        console.log(error);
     }
 }
