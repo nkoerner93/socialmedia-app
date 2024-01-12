@@ -12,11 +12,11 @@ export async function createUserAccount(user:INewUser) {
             user.password,
             user.name
         )
+        return true;
     } catch (error) {
         console.log(error);
-        return error;
+        return false;
     }
-
 }
 
 export async function saveUserToDb(user:IDbUser) {

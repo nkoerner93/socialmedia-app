@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -20,6 +21,7 @@ const SignupForm = () => {
   // Loading State
   let [isLoading, setIsLoading] = useState(false);
   let accountCreated = false;
+  const { toast } = useToast();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -36,12 +38,23 @@ const SignupForm = () => {
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
     const newUser = await createUserAccount(values);
 
-    console.log(newUser);
+    if (!newUser) {
+      toast({
+        variant: "destructive",
+        title: "Oops!",
+        description: "Something went wrong, please try again later!",
+      });
+    } else {
+      toast({
+        variant: "default",
+        title: "Success!",
+        description: "Your account has been successfully created.",
+      });
+    }
   }
 
   return (
     <>
-      <Button onClick={onClickQuery}></Button>
       {accountCreated ? (
         <Button className="shad-button_primary">Signed up</Button>
       ) : (
