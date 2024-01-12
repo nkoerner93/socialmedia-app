@@ -1,5 +1,5 @@
 import { INewUser, IDbUser } from "@/types";
-import { ID } from 'appwrite';
+import { ID, Query } from 'appwrite';
 import { account, appwriteConfig, databases } from './config';
 
 
@@ -13,7 +13,7 @@ export async function createUserAccount(user: INewUser) {
             user.password,
             user.name
         );
-        return true; // Indicate success
+        return; // Indicate success
     } catch (error) {
         console.log(error);
         return false; // Indicate failure
@@ -30,6 +30,29 @@ export async function saveUserToDb(user:IDbUser) {
         )  
     } catch (error) {
         
+    }
+}
+
+export async function getUserFromDbByEmail(email: string) {
+    try {
+        const query = [
+            // Query to find a document with the specified email
+            Query.equal('email', email),
+        ];
+
+        const result = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            query
+        );
+
+        // If documents are returned, return the first one
+        console.log(result.documents);
+        console.log(result.documents.length);
+        if (result.documents.length > 0) return true;
+    } catch (error) {
+        console.error(error);
+        return false; // Indicate failure
     }
 }
 

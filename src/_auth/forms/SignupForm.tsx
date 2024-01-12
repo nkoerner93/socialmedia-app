@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { SignupValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
 import { useCreateUserAccount } from "@/lib/react-query/queriesAndMutations";
+import { getUserFromDbByEmail, saveUserToDb } from "@/lib/appwrite/api";
 
 const SignupForm = () => {
   const { toast } = useToast();
@@ -36,12 +37,18 @@ const SignupForm = () => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
     const newUser = await createUserAccount(values);
-
-    if (!newUser) {
+    const userExist = await getUserFromDbByEmail(values.email);
+    if (userExist) {
       toast({
         variant: "destructive",
         title: "Oops!",
-        description: "Something went wrong, please try again later!",
+        description: "Email has already been taken.",
+      });
+    } else if (!newUser) {
+      toast({
+        variant: "destructive",
+        title: "Oops!",
+        description: "An error occured.",
       });
     } else {
       toast({
