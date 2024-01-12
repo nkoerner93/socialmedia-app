@@ -46,3 +46,11 @@ export type INavLink = {
     username: string;
     password: string;
   };
+
+  export type IDbUser = {
+      accountId: string,
+      username?: string,
+      password: string,
+      email: string,
+      imageUrl: URL,
+  };

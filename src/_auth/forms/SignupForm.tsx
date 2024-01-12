@@ -41,6 +41,7 @@ const SignupForm = () => {
 
   return (
     <>
+      <Button onClick={onClickQuery}></Button>
       {accountCreated ? (
         <Button className="shad-button_primary">Signed up</Button>
       ) : (
