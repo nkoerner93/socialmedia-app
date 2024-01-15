@@ -17,9 +17,9 @@ const SignupForm = () => {
   const { isAuthenticated, checkAuthUser, isLoading: isUserLoading } = useUserContext();
   const navigate = useNavigate();
 
+  // Already logged in? => Redirect to Home
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("Already logged in, redirecting to home.");
       navigate("/");
     }
   }, [isAuthenticated, navigate]);
