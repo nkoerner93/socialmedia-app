@@ -15,10 +15,14 @@ import { Input } from "@/components/ui/input";
 import { SignupValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
 import { useCreateUserAccount } from "@/lib/react-query/queriesAndMutations";
-import { getUserFromDbByEmail, saveUserToDb } from "@/lib/appwrite/api";
+import { saveUserToDb, signInAccount } from "@/lib/appwrite/api";
+import { useUserContext } from "@/context/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const { toast } = useToast();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const navigate = useNavigate();
 
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
     useCreateUserAccount();
@@ -37,25 +41,30 @@ const SignupForm = () => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
     const newUser = await createUserAccount(values);
-    const userExist = await getUserFromDbByEmail(values.email);
-    if (userExist) {
-      toast({
-        variant: "destructive",
-        title: "Oops!",
-        description: "Email has already been taken.",
+
+    if (!newUser) {
+      return toast({
+        title: "Sign up failed!",
+        description: "Please check your input and try again.",
       });
-    } else if (!newUser) {
-      toast({
-        variant: "destructive",
-        title: "Oops!",
-        description: "An error occured.",
+    }
+
+    const session = await signInAccount({
+      email: values.email,
+      password: values.password,
+    });
+
+    if (!session) {
+      return toast({
+        title: "Sign up failed!",
+        description: "Please check your input and try again.",
       });
-    } else {
-      toast({
-        variant: "default",
-        title: "Success!",
-        description: "Your account has been successfully created.",
-      });
+    }
+
+    const isLoggedIn = await checkAuthUser();
+
+    if (isLoggedIn) {
+      navigate("/");
     }
   }
 
