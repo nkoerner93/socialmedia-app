@@ -1,33 +1,34 @@
+import { useEffect } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SignupValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
-import { useCreateUserAccount } from "@/lib/react-query/queriesAndMutations";
-import { saveUserToDb, signInAccount } from "@/lib/appwrite/api";
+import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const { toast } = useToast();
-  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const { isAuthenticated, checkAuthUser, isLoading: isUserLoading } = useUserContext();
   const navigate = useNavigate();
 
-  const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
-    useCreateUserAccount();
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("Already logged in, redirecting to home.");
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
-  // 1. Define your form.
+  // Queries
+  const { mutateAsync: createUserAccount, isPending: isCreatingAccount } = useCreateUserAccount();
+  const { mutateAsync: signInAccount, isPending: isSigningIn } = useSignInAccount();
+
+  // Define Form
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
@@ -38,33 +39,43 @@ const SignupForm = () => {
     },
   });
 
-  // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof SignupValidation>) {
-    const newUser = await createUserAccount(values);
+  // Handler
+  async function handleSignUp(user: z.infer<typeof SignupValidation>) {
+    try {
+      const newUser = await createUserAccount(user);
 
-    if (!newUser) {
-      return toast({
-        title: "Sign up failed!",
-        description: "Please check your input and try again.",
+      if (!newUser) {
+        toast({ title: "Sign up failed. Please try again." });
+
+        return;
+      }
+
+      const session = await signInAccount({
+        email: user.email,
+        password: user.password,
       });
-    }
 
-    const session = await signInAccount({
-      email: values.email,
-      password: values.password,
-    });
+      if (!session) {
+        toast({ title: "Something went wrong. Please login your new account" });
 
-    if (!session) {
-      return toast({
-        title: "Sign up failed!",
-        description: "Please check your input and try again.",
-      });
-    }
+        navigate("/sign-in");
 
-    const isLoggedIn = await checkAuthUser();
+        return;
+      }
 
-    if (isLoggedIn) {
-      navigate("/");
+      const isLoggedIn = await checkAuthUser();
+
+      if (isLoggedIn) {
+        form.reset();
+
+        navigate("/");
+      } else {
+        toast({ title: "Login failed. Please try again." });
+
+        return;
+      }
+    } catch (error) {
+      console.log({ error });
     }
   }
 
@@ -73,16 +84,9 @@ const SignupForm = () => {
       <Form {...form}>
         <div className="sm:w-420 flex-center flex-col">
           <img src="/assets/images/logo.svg" />
-          <h2 className="h3-bold md:h4-bold pt-5 sm:pt-8">
-            Create a new Account
-          </h2>
-          <p className="text-light-3 small-medium md:base-regular mt-2">
-            To use Snapgram enter your details
-          </p>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col w-full mt-4 space-y-4 text-white"
-          >
+          <h2 className="h3-bold md:h4-bold pt-5 sm:pt-8">Create a new Account</h2>
+          <p className="text-light-3 small-medium md:base-regular mt-2">To use Snapgram enter your details</p>
+          <form onSubmit={form.handleSubmit(handleSignUp)} className="flex flex-col w-full mt-4 space-y-4 text-white">
             <FormField
               control={form.control}
               name="name"
@@ -90,12 +94,7 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      className="text-white shad-input"
-                      placeholder="Enter name"
-                      type="name"
-                      {...field}
-                    />
+                    <Input className="text-white shad-input" placeholder="Enter name" type="name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,12 +107,7 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input
-                      className="text-white shad-input"
-                      placeholder="Enter username"
-                      type="username"
-                      {...field}
-                    />
+                    <Input className="text-white shad-input" placeholder="Enter username" type="username" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,12 +120,7 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      className="text-white shad-input"
-                      placeholder="Enter Email"
-                      type="email"
-                      {...field}
-                    />
+                    <Input className="text-white shad-input" placeholder="Enter Email" type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,19 +133,14 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      className="text-white shad-input"
-                      placeholder="Enter password"
-                      type="password"
-                      {...field}
-                    />
+                    <Input className="text-white shad-input" placeholder="Enter password" type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button className="shad-button_primary pt-2" type="submit">
-              {isCreatingUser ? (
+              {isCreatingAccount ? (
                 <div className="flex flex-row items-center gap-2">
                   <Loader /> Loading...
                 </div>

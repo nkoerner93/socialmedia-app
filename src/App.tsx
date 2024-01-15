@@ -7,28 +7,29 @@ import "./globals.css";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
 import { Toaster } from "@/components/ui/toaster";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-const queryClient = new QueryClient();
+import QueryProvider from "./lib/react-query/QueryProvider";
+import { AuthProvider } from "./context/AuthContext";
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <main className="flex h-screen">
-        <Routes>
-          {/* public routes */}
-          <Route element={<AuthLayout />}>
-            <Route path="/sign-in" element={<SigninForm />} />
-            <Route path="/sign-up" element={<SignupForm />} />
-          </Route>
-          {/* private routes */}
-          <Route element={<RootLayout />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-        <Toaster />
-      </main>
-    </QueryClientProvider>
+    <QueryProvider>
+      <AuthProvider>
+        <main className="flex h-screen">
+          <Routes>
+            {/* public routes */}
+            <Route element={<AuthLayout />}>
+              <Route path="/sign-in" element={<SigninForm />} />
+              <Route path="/sign-up" element={<SignupForm />} />
+            </Route>
+            {/* private routes */}
+            <Route element={<RootLayout />}>
+              <Route index element={<Home />} />
+            </Route>
+          </Routes>
+          <Toaster />
+        </main>
+      </AuthProvider>
+    </QueryProvider>
   );
 };
 

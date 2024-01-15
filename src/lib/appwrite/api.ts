@@ -1,65 +1,64 @@
-import { INewUser, IDbUser } from "@/types";
+import { INewUser } from "@/types";
 import { ID, Query } from 'appwrite';
-import { account, appwriteConfig, databases } from './config';
+import { account, appwriteConfig, databases, avatars } from './config';
 
 
 
+// ============================== SIGN UP
 export async function createUserAccount(user: INewUser) {
     try {
-        // Using the Appwrite library to create a new user account
-        const newAccount = await account.create(
-            ID.unique(),
-            user.email,
-            user.password,
-            user.name
-        );
-        return; // Indicate success
-    } catch (error) {
-        console.log(error);
-        return false; // Indicate failure
-    }
-}
+      const newAccount = await account.create(
+        ID.unique(),
+        user.email,
+        user.password,
+        user.name
+      );
+  
+      if (!newAccount) throw Error;
+  
+      const avatarUrl = avatars.getInitials(user.name);
 
-export async function saveUserToDb(user:IDbUser) {
+      const newUser = await saveUserToDB({
+        accountId: newAccount.$id,
+        name: newAccount.name,
+        email: newAccount.email,
+        username: user.username,
+        imageUrl: avatarUrl,
+      });
+  
+      return newUser;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+// ============================== SAVE USER TO DB
+export async function saveUserToDB(user: {
+    accountId: string;
+    email: string;
+    name: string;
+    imageUrl: URL;
+    username?: string;
+  }) {
     try {
-        const newUser = await databases.createDocument(
-            appwriteConfig.databaseId,
-            appwriteConfig.userCollectionId,
-            ID.unique(),
-            user,
-        )  
+      const newUser = await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userCollectionId,
+        ID.unique(),
+        user
+      );
+    console.log("Document created with User: " + user);
+      return newUser;
     } catch (error) {
-        
+      console.log(error);
     }
-}
-
-export async function getUserFromDbByEmail(email: string) {
-    try {
-        const query = [
-            // Query to find a document with the specified email
-            Query.equal('email', email),
-        ];
-
-        const result = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.userCollectionId,
-            query
-        );
-
-        // If documents are returned, return the first one
-        console.log(result.documents);
-        console.log(result.documents.length);
-        if (result.documents.length > 0) return true;
-    } catch (error) {
-        console.error(error);
-        return false; // Indicate failure
-    }
-}
+  }
 
 export async function signInAccount(user: { email: string; password:string;}) {
     try {
         const session = await account.createEmailSession(user.email, user.password);
-
+        console.log("Session created.");
         return session;
     } catch (error) {
         console.log(error);
@@ -79,7 +78,6 @@ export async function getCurrentUser() {
         )
 
         if(!currentAccount) throw Error;
-
         return currentUser.documents[0];
     } catch (error) {
         console.log(error);
