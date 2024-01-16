@@ -14,19 +14,12 @@ import { Link, useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const { toast } = useToast();
-  const { isAuthenticated, checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
   const navigate = useNavigate();
-
-  // Already logged in? => Redirect to Home
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
 
   // Queries
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } = useCreateUserAccount();
-  const { mutateAsync: signInAccount, isPending: isSigningIn } = useSignInAccount();
+  const { mutateAsync: signInAccount, isPending: isSigningInUser } = useSignInAccount();
 
   // Define Form
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -66,8 +59,6 @@ const SignupForm = () => {
       const isLoggedIn = await checkAuthUser();
 
       if (isLoggedIn) {
-        form.reset();
-
         navigate("/");
       } else {
         toast({ title: "Login failed. Please try again." });
@@ -139,13 +130,13 @@ const SignupForm = () => {
                 </FormItem>
               )}
             />
-            <Button className="shad-button_primary pt-2" type="submit">
-              {isCreatingAccount ? (
-                <div className="flex flex-row items-center gap-2">
+            <Button type="submit" className="shad-button_primary">
+              {isCreatingAccount || isSigningInUser || isUserLoading ? (
+                <div className="flex-center gap-2">
                   <Loader /> Loading...
                 </div>
               ) : (
-                "Submit"
+                "Sign Up"
               )}
             </Button>
           </form>

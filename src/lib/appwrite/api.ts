@@ -55,22 +55,38 @@ export async function saveUserToDB(user: {
     }
   }
 
-export async function signInAccount(user: { email: string; password:string;}) {
-    try {
-        const session = await account.createEmailSession(user.email, user.password);
-        console.log("Session created.");
-        return session;
-    } catch (error) {
-        console.log(error);
-    }
+// ============================== SIGN IN
+export async function signInAccount(user: { email: string; password: string }) {
+  try {
+    const session = await account.createEmailSession(user.email, user.password);
+
+    return session;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function signOutAccount() {
+  try {
+    console.log("try reached");
+    const session = await account.deleteSession("current");
+
+    return session;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getCurrentUser() {
     try {
+      console.log("getting session");
+      const currentSession = await account.getSession("current");
+      console.log(currentSession);
+      if (!currentSession) return;
+      console.log("getting account if possible");
         const currentAccount = await account.get();
 
         if(!currentAccount) throw Error;
-
         const currentUser = await databases.listDocuments(
             appwriteConfig.databaseId,
             appwriteConfig.userCollectionId,
