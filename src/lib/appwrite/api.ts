@@ -78,24 +78,30 @@ export async function signOutAccount() {
 }
 
 export async function getCurrentUser() {
-    try {
-      console.log("getting session");
-      const currentSession = await account.getSession("current");
-      console.log(currentSession);
-      if (!currentSession) return;
-      console.log("getting account if possible");
-        const currentAccount = await account.get();
+  try {
+    // Retrieve the current account
+    const currentAccount = await account.get();
 
-        if(!currentAccount) throw Error;
-        const currentUser = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.userCollectionId,
-            [Query.equal('accountId', currentAccount.$id)],
-        )
-
-        if(!currentAccount) throw Error;
-        return currentUser.documents[0];
-    } catch (error) {
-        console.log(error);
+    if (!currentAccount) {
+      console.error("Unable to retrieve current account");
+      throw new Error("Unable to retrieve current account");
     }
+
+    // Fetch additional user data from the database
+    const currentUser = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.equal("accountId", currentAccount.$id)]
+    );
+
+    if (!currentUser.documents.length) {
+      console.warn("No user data found in the database");
+      return null; // or handle the lack of user data appropriately
+    }
+
+    return currentUser.documents[0];
+  } catch (error) {
+    // Handle the case where there is no active session
+    return null;
+  }
 }
