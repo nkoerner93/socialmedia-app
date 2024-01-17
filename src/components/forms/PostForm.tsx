@@ -12,7 +12,7 @@ import FileUploader from "../shared/FileUploader";
 const formSchema = z.object({
   caption: z.string().min(4).max(80),
 });
-export default function PostForm() {
+export default function PostForm(post) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,7 +51,7 @@ export default function PostForm() {
             <FormItem>
               <FormLabel className="shad-form_label">Add photos</FormLabel>
               <FormControl>
-                <FileUploader />
+                <FileUploader fieldChange={field.onChange} mediaUrl={post?.imageUrl} />
               </FormControl>
               <FormMessage className="shad-form_message" />
             </FormItem>
