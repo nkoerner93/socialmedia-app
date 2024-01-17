@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import DeleteIcon from "./deleteIcon";
+import DeleteIcon from "./DeleteIcon";
 
 interface FileUploaderProps {
   fieldChange: (FILES: File[]) => void;
