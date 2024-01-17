@@ -14,5 +14,8 @@ export const SigninValidation = z.object({
   });
 
 export const PostValidation = z.object({
-    
+    caption: z.string().min(8, {message: "The entered caption must be at least 8 characters."}).max(80),
+    location: z.string().min(2, {message: "The entered location must be at least 2 characters."}),
+    photos: z.string().min(2, {message: "The uploaded photos must be at least 2 characters."}),
+    tags: z.string().min(2, {message: "The entered tags must be at least 3 characters."}) 
 })

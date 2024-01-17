@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import DeleteIcon from "./deleteIcon";
 
 interface FileUploaderProps {
   fieldChange: (FILES: File[]) => void;
@@ -26,7 +27,8 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
       <input {...getInputProps()} className="cursor-pointer" />
       {fileUrl ? (
         <div>
-          <img src="/assets/icons/delete.svg" width={32} height={32} className="bg-slate-200"></img>
+          <DeleteIcon width={32} height={32} />
+          <img src="/assets/icons/delete.svg" width={32} height={32} alt="delete"></img>
           <img src={fileUrl} alt="Preview" />
         </div>
       ) : (
