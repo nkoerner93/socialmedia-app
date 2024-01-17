@@ -26,6 +26,7 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
       <input {...getInputProps()} className="cursor-pointer" />
       {fileUrl ? (
         <div>
+          <img src="/assets/icons/delete.svg" width={32} height={32} className="bg-slate-200"></img>
           <img src={fileUrl} alt="Preview" />
         </div>
       ) : (
