@@ -37,17 +37,19 @@ export default function PostForm({ post }: PostFormProps) {
   });
 
   // Define Submit-Handler
-  function handleSubmit(values: z.infer<typeof PostValidation>) {
-    // const newPost = await createPost({
-    //   ...values,
-    //   userId: user.id,
-    // });
-    // if (!newPost) {
-    //   toast({
-    //     title: "Please try again",
-    //   });
-    // }
-  }
+  const handleSubmit = async (values: z.infer<typeof PostValidation>) => {
+    const newPost = await createPost({
+      ...values,
+      userId: user.id,
+    });
+
+    if (!newPost) {
+      toast({
+        title: `Post failed. Please try again.`,
+      });
+    }
+    navigate("/");
+  };
 
   return (
     <Form {...form}>

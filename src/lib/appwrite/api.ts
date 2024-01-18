@@ -117,9 +117,7 @@ export async function createPost(post: INewPost) {
 
     if (!uploadedFile) throw Error;
 
-    const fileUrl = getFilePreview(uploadedFile.$id);
-
-    // Delete File in case of unintended error
+    const fileUrl = await getFilePreview(uploadedFile.$id);
     if (!fileUrl) {
       deleteFile(uploadedFile.$id)
       throw Error;
@@ -127,6 +125,7 @@ export async function createPost(post: INewPost) {
 
     // Convert Post-Tags into an Array
     const tags = post.tags?.replace(/ /g, '').split(',') || [];
+
     const newPost = databases.createDocument(appwriteConfig.databaseId, appwriteConfig.postCollectionId, ID.unique(), {
       creator: post.userId,
       caption: post.caption,
@@ -139,6 +138,8 @@ export async function createPost(post: INewPost) {
       await deleteFile(uploadedFile.$id)
       throw Error;
     }
+
+    return newPost;
   } catch (error) {
     console.log(error);
   }
@@ -183,4 +184,17 @@ export async function deleteFile(fileId: string) {
   } catch (error) {
     console.log(error);
   }
+}
+
+// ============================== GET RECENT POSTS
+
+export async function getRecentPosts() {
+  const posts = await databases.listDocuments(
+    appwriteConfig.databaseId, 
+    appwriteConfig.postCollectionId, 
+    [Query.orderDesc(''), Query.limit(20)])
+
+  if(!posts) throw Error
+
+  return posts;
 }
