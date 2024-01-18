@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -10,29 +8,50 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import { PostValidation } from "@/lib/validation";
 import FileUploader from "../shared/FileUploader";
+import { Models } from "appwrite";
+import { useCreatePost } from "@/lib/react-query/queriesAndMutations";
+import { useUserContext } from "@/context/AuthContext";
+import { useToast } from "../ui/use-toast";
 
-export default function PostForm(post) {
-  // 1. Define your form.
+export type PostFormProps = {
+  post?: Models.Document;
+};
+
+export default function PostForm({ post }: PostFormProps) {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const { user } = useUserContext();
+
+  const { mutateAsync: createPost, isPending: isLoadingCreate } = useCreatePost();
+
+  // Define the PostForm
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
-      caption: "",
-      photos: "",
-      location: "",
-      tags: "",
+      caption: post ? post?.caption : "",
+      file: [],
+      location: post ? post?.location : "",
+      tags: post ? post?.tags.join(",") : "",
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof PostValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  // Define Submit-Handler
+  function handleSubmit(values: z.infer<typeof PostValidation>) {
+    // const newPost = await createPost({
+    //   ...values,
+    //   userId: user.id,
+    // });
+    // if (!newPost) {
+    //   toast({
+    //     title: "Please try again",
+    //   });
+    // }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-9 w-full max-w-5xl">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-9 w-full  max-w-5xl">
         <FormField
           control={form.control}
           name="caption"
@@ -46,12 +65,13 @@ export default function PostForm(post) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="photos"
+          name="file"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add photos</FormLabel>
+              <FormLabel className="shad-form_label">Add Photos</FormLabel>
               <FormControl>
                 <FileUploader fieldChange={field.onChange} mediaUrl={post?.imageUrl} />
               </FormControl>
@@ -59,12 +79,13 @@ export default function PostForm(post) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="location"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add location</FormLabel>
+              <FormLabel className="shad-form_label">Add Location</FormLabel>
               <FormControl>
                 <Input type="text" className="shad-input" {...field} />
               </FormControl>
@@ -72,12 +93,13 @@ export default function PostForm(post) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="tags"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add Tags (separated by comma ",")</FormLabel>
+              <FormLabel className="shad-form_label">Add Tags (separated by comma " , ")</FormLabel>
               <FormControl>
                 <Input placeholder="Art, Expression, Learn" type="text" className="shad-input" {...field} />
               </FormControl>
@@ -85,12 +107,13 @@ export default function PostForm(post) {
             </FormItem>
           )}
         />
-        <div className="flex items-center justify-end gap-4">
-          <Button type="button" className="shad-button_dark_4">
+
+        <div className="flex gap-4 items-center justify-end">
+          <Button type="button" className="shad-button_dark_4" onClick={() => navigate(-1)}>
             Cancel
           </Button>
           <Button type="submit" className="shad-button_primary whitespace-nowrap">
-            Submit
+            Create Post
           </Button>
         </div>
       </form>

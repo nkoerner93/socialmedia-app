@@ -1,6 +1,6 @@
-import { INewUser } from "@/types";
+import { INewPost, INewUser } from "@/types";
 import { ID, Query } from 'appwrite';
-import { account, appwriteConfig, databases, avatars } from './config';
+import { account, appwriteConfig, databases, avatars, storage } from './config';
 
 
 
@@ -77,6 +77,8 @@ export async function signOutAccount() {
   }
 }
 
+// ============================== GET USER
+
 export async function getCurrentUser() {
   try {
     // Retrieve the current account
@@ -103,5 +105,35 @@ export async function getCurrentUser() {
   } catch (error) {
     // Handle the case where there is no active session
     return null;
+  }
+}
+
+// ============================== CREATE POST
+
+export async function createPost(post: INewPost) {
+  try {
+    // Await upload-file
+    const uploadedfile = await uploadFile(post.file[0]);
+
+    if (!uploadedfile) throw Error;
+
+    const fileUrl = getFilePreview(uploadedFile.$id);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== UPLOAD FILE
+
+export async function uploadFile(file: File) {
+  try {
+    // Await upload-file
+    const uploadedfile = await storage.createFile(
+      appwriteConfig.storageId,
+      ID.unique(),
+      file
+    )
+  } catch (error) {
+    console.log(error);
   }
 }

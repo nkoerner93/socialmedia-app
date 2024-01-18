@@ -26,10 +26,9 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
     <div {...getRootProps()} className="flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer">
       <input {...getInputProps()} className="cursor-pointer" />
       {fileUrl ? (
-        <div>
-          <DeleteIcon width={32} height={32} />
-          <img src="/assets/icons/delete.svg" width={32} height={32} alt="delete"></img>
-          <img src={fileUrl} alt="Preview" />
+        <div className="flex flex-col flex-center">
+          <img src={fileUrl} className="file_uploader-img" alt="Preview" />
+          <p className="file_uploader-label">Click or drag photo to replace</p>
         </div>
       ) : (
         <div className="file_uploader-box">
