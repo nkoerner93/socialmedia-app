@@ -112,12 +112,33 @@ export async function getCurrentUser() {
 
 export async function createPost(post: INewPost) {
   try {
-    // Await upload-file
-    const uploadedfile = await uploadFile(post.file[0]);
+    // Upload image to storage
+    const uploadedFile = await uploadFile(post.file[0]);
 
-    if (!uploadedfile) throw Error;
+    if (!uploadedFile) throw Error;
 
     const fileUrl = getFilePreview(uploadedFile.$id);
+
+    // Delete File in case of unintended error
+    if (!fileUrl) {
+      deleteFile(uploadedFile.$id)
+      throw Error;
+    }
+
+    // Convert Post-Tags into an Array
+    const tags = post.tags?.replace(/ /g, '').split(',') || [];
+    const newPost = databases.createDocument(appwriteConfig.databaseId, appwriteConfig.postCollectionId, ID.unique(), {
+      creator: post.userId,
+      caption: post.caption,
+      imageUrl: fileUrl,
+      imageId: uploadedFile.$id,
+      tags: tags
+    })
+
+    if (!newPost) {
+      await deleteFile(uploadedFile.$id)
+      throw Error;
+    }
   } catch (error) {
     console.log(error);
   }
@@ -128,11 +149,37 @@ export async function createPost(post: INewPost) {
 export async function uploadFile(file: File) {
   try {
     // Await upload-file
-    const uploadedfile = await storage.createFile(
+    const uploadedFile = await storage.createFile(
       appwriteConfig.storageId,
       ID.unique(),
       file
     )
+
+    return uploadedFile;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== GET FILE PREVIEW
+
+export async function getFilePreview(fileId: string) {
+  try {
+    // Await upload-file
+    const fileUrl = storage.getFilePreview(appwriteConfig.storageId, fileId, 2000, 2000, "top", 100)
+
+    return fileUrl;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== DELETE FILE
+
+export async function deleteFile(fileId: string) {
+  try {
+    await storage.deleteFile(appwriteConfig.storageId, fileId)
+    return { status: 'ok' };
   } catch (error) {
     console.log(error);
   }
