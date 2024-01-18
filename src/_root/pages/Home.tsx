@@ -1,20 +1,30 @@
-import { getRecentPosts } from "@/lib/appwrite/api";
+import Loader from "@/components/shared/Loader";
 import { useGetRecentPosts } from "@/lib/react-query/queriesAndMutations";
 
 const Home = () => {
-  const posts = useGetRecentPosts();
-  const data = posts.data;
+  const { data: posts, isPending: isPostLoading, isError } = useGetRecentPosts();
+  const test = false;
 
   return (
     <div>
-      {data?.documents.map((post) => (
-        <div key={post.$id}>
-          {/* Render post details here */}
-          <p>Caption: {post.caption}</p>
-          <img src={post.imageUrl} alt="Post Image" />
-          {/* Add more details as needed */}
+      <div className="flex flex-1">
+        <div className="home-container">
+          <div className="home-posts">
+            <h2 className="h3-bold md:52-bold text-left w-full">Home Feed</h2>
+            {isPostLoading && !posts ? (
+              <Loader />
+            ) : (
+              <ul>
+                {posts?.documents.map((post) => (
+                  <li key={post.$id} className="whitespace-wrap">
+                    {post.imageUrl}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
