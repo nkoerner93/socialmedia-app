@@ -1,5 +1,7 @@
 import Loader from "@/components/shared/Loader";
+import PostCard from "@/components/shared/PostCard";
 import { useGetRecentPosts } from "@/lib/react-query/queriesAndMutations";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const { data: posts, isPending: isPostLoading, isError } = useGetRecentPosts();
@@ -14,10 +16,10 @@ const Home = () => {
             {isPostLoading && !posts ? (
               <Loader />
             ) : (
-              <ul>
+              <ul className="flex flex-col flex-1 gap-9 w-full">
                 {posts?.documents.map((post) => (
                   <li key={post.$id} className="whitespace-wrap">
-                    {post.imageUrl}
+                    <PostCard post={post}></PostCard>
                   </li>
                 ))}
               </ul>

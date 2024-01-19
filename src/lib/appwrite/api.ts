@@ -129,6 +129,7 @@ export async function createPost(post: INewPost) {
     const newPost = databases.createDocument(appwriteConfig.databaseId, appwriteConfig.postCollectionId, ID.unique(), {
       creator: post.userId,
       caption: post.caption,
+      location: post.location,
       imageUrl: fileUrl,
       imageId: uploadedFile.$id,
       tags: tags
