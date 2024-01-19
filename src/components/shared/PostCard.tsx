@@ -6,9 +6,10 @@ import { useUserContext } from "@/context/AuthContext";
 
 type PostCardProps = {
   post: Models.Document;
+  isPostLoading?: boolean;
 };
 
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post, isPostLoading }: PostCardProps) => {
   const { user } = useUserContext();
 
   if (!post.creator) return;
@@ -24,7 +25,7 @@ const PostCard = ({ post }: PostCardProps) => {
           <div className="flex flex-col">
             <p className="base-medium lg:body-bold text-light-1">{post.creator.name}</p>
             <div className="flex-center gap-2 text-light-3">
-              <p className="subtle-semibold lg:small-regular ">{multiFormatDateString(post.$createdAt)}</p>-
+              <p className="subtle-semibold lg:small-regular">{multiFormatDateString(post.$createdAt)}</p>-
               <p className="subtle-semibold lg:small-regular">{post.location}</p>
             </div>
           </div>
