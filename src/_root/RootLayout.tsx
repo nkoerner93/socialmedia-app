@@ -5,15 +5,18 @@ import { Outlet } from "react-router-dom";
 
 const RootLayout = () => {
   return (
-    <div className="w-full md:flex">
-      <TopBar />
+    <div className="flex w-full h-screen">
       <LeftSidebar />
 
-      <section className="flex flex-1 h-full">
-        <Outlet />
-      </section>
+      <div className="flex flex-col w-full h-screen">
+        <TopBar />
 
-      <Bottombar />
+        <section className="flex-1 overflow-y-auto">
+          <Outlet />
+        </section>
+
+        <Bottombar />
+      </div>
     </div>
   );
 };
