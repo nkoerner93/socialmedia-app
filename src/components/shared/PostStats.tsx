@@ -13,7 +13,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     setLiked(true);
   };
 
-  const handledisLikePost = () => {
+  const handleisLikePost = () => {
     setLiked(false);
   };
 
@@ -24,7 +24,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
           src="/assets/icons/liked.svg"
           alt="liked"
           className="w-6 h-6"
-          onClick={handledisLikePost}
+          onClick={handleisLikePost}
         />
       ) : (
         <img
