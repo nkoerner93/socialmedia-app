@@ -64,9 +64,8 @@ const PostCard = ({ post, isPostLoading }: PostCardProps) => {
           className="post-card_img"
         />
       </Link>
-      <div className="flex flex-row justify-between px-2">
-        <PostStats post={post} userId={post?.creator?.id} />
-        test
+      <div className="px-2">
+        <PostStats post={post} userId={user.id} />
       </div>
     </div>
   );
