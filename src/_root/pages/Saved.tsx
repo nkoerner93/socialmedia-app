@@ -6,6 +6,7 @@ import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutations";
 const Saved = () => {
   const { data: currentUser } = useGetCurrentUser();
 
+  console.log(currentUser?.save);
   const savePosts = currentUser?.save
     .map((savePost: Models.Document) => ({
       ...savePost.post,
@@ -14,6 +15,8 @@ const Saved = () => {
       },
     }))
     .reverse();
+
+  console.log(savePosts);
 
   return (
     <div className="saved-container">
